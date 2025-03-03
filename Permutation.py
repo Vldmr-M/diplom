@@ -1,13 +1,14 @@
 import numpy as np
-import main
+
 
 
 class Permutation:
-
-    def __init__(self, perm):
+    my_loss=None
+    def __init__(self, perm,loss):
 
         self._perm = perm
-        self._loss = main.loss(self._perm)
+        Permutation.my_loss = loss
+        self._loss = Permutation.my_loss(self._perm)
 
     def __ne__(self, other):
         return np.sum(np.array(self._perm) != np.array(other.perm))
@@ -22,7 +23,7 @@ class Permutation:
     @perm.setter
     def perm(self,permut):
         self._perm=permut
-        self._loss=main.loss(self._perm)
+        self._loss= Permutation.my_loss(self._perm)
 
     @property
     def loss(self):

@@ -3,7 +3,7 @@ from copy import copy, deepcopy
 from Permutation import Permutation
 
 
-def cxPartialyMatched(par1, par2):
+def cxPartialyMatched(par1, par2,loss):
     """Executes a partially matched crossover (PMX) on the input individuals.
     The two individuals are modified in place. This crossover expects
     :term:`sequence` individuals of indices, the result for any other type of
@@ -54,7 +54,8 @@ def cxPartialyMatched(par1, par2):
         # Position bookkeeping
         p1[temp1], p1[temp2] = p1[temp2], p1[temp1]
         p2[temp1], p2[temp2] = p2[temp2], p2[temp1]
-
+    ind1 = Permutation(ind1.perm,loss)
+    ind2 = Permutation(ind2.perm,loss)
     return ind1, ind2
 
 
@@ -68,10 +69,10 @@ def hamming(par1: Permutation, par2: Permutation):
     return par1 != par2
 
 
-def generate_origin_population(size_of_population, tasks):
+def generate_origin_population(size_of_population, tasks,loss):
     """returns list of Permutations where length of list = /size_of_population/ """
     perms = random.choices([*itertools.permutations(range(len(tasks)))], k=size_of_population)
-    return [Permutation(list(i)) for i in perms]
+    return [Permutation(list(i),loss) for i in perms]
 
 def auto_breeding(population):
     """
@@ -138,8 +139,8 @@ def elite_selection(curr_population,childs,replace_coef=1,elite_coef=0.5):
     return next_gen
 
 
-def fit(tasks, count_of_generations, population_size):
-    curr_population = generate_origin_population(population_size, tasks)
+def fit(tasks, count_of_generations, population_size,loss):
+    curr_population = generate_origin_population(population_size, tasks,loss)
 
 
     for i in range(count_of_generations):
@@ -151,7 +152,7 @@ def fit(tasks, count_of_generations, population_size):
         #выбираем родителей и воспроизводим потомков
         for j in range(population_size // 2):
             par1, par2 = choose_parents(population_copy)
-            child1, child2 = cxPartialyMatched(par1, par2)
+            child1, child2 = cxPartialyMatched(par1, par2,loss)
             childs += [child1, child2]
 
         #добавляем мутантов к потомкам
