@@ -141,8 +141,6 @@ def elite_selection(curr_population,childs,replace_coef=1,elite_coef=0.5):
 def fit(tasks, count_of_generations, population_size):
     curr_population = generate_origin_population(population_size, tasks)
 
-    # for _ in tasks:
-    #     print(_)
 
     for i in range(count_of_generations):
 

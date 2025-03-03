@@ -5,8 +5,6 @@ class Task:
     # EndTime = 0
     def __init__(self, number, destTime, time, direktiv):
         self.num = number
-        self.StartTime = 0
-        self.EndTime = 0
         self.DestTime = random.randrange(destTime[0], destTime[1])
         self.Time = random.randrange(time[0], time[1])
         self.Direktiv = random.randrange(direktiv[0], direktiv[1])

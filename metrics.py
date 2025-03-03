@@ -5,6 +5,8 @@ import Task
 def Loss(tasks):
     """Принимает на вход массив объектов Task и перестановку
     возвращает перестановку с лучшим(меньшим) лоссом"""
+    for i in tasks:
+        print(i)
     def loss(perm):
         loss = 0
         curr_time = 0
