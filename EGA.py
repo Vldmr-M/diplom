@@ -3,7 +3,7 @@ from copy import copy, deepcopy
 from Permutation import Permutation
 
 
-def cxPartialyMatched(par1, par2,loss):
+def cxPartialyMatched(par1:Permutation, par2:Permutation,loss):
     """Executes a partially matched crossover (PMX) on the input individuals.
     The two individuals are modified in place. This crossover expects
     :term:`sequence` individuals of indices, the result for any other type of
@@ -23,15 +23,15 @@ def cxPartialyMatched(par1, par2,loss):
     .. [Goldberg1985] Goldberg and Lingel, "Alleles, loci, and the traveling
        salesman problem", 1985.
     """
-    ind1 = deepcopy(par1)
-    ind2 = deepcopy(par2)
-    size = min(len(ind1.perm), len(ind2.perm))
+    ind1 = deepcopy(par1.perm)
+    ind2 = deepcopy(par2.perm)
+    size = min(len(ind1), len(ind2))
     p1, p2 = [0] * size, [0] * size
 
     # Initialize the position of each indices in the individuals
     for i in range(size):
-        p1[ind1.perm[i]] = i
-        p2[ind2.perm[i]] = i
+        p1[ind1[i]] = i
+        p2[ind2[i]] = i
     # print(p1,p2)
     # Choose crossover points
     cxpoint1 = random.randint(0, size)
@@ -45,17 +45,17 @@ def cxPartialyMatched(par1, par2,loss):
     # Apply crossover between cx points
     for i in range(cxpoint1, cxpoint2):
         # Keep track of the selected values
-        temp1 = ind1.perm[i]
-        temp2 = ind2.perm[i]
+        temp1 = ind1[i]
+        temp2 = ind2[i]
         # Swap the matched value
         # print(ind1)
-        ind1.perm[i], ind1.perm[p1[temp2]] = temp2, temp1
-        ind2.perm[i], ind2.perm[p2[temp1]] = temp1, temp2
+        ind1[i], ind1[p1[temp2]] = temp2, temp1
+        ind2[i], ind2[p2[temp1]] = temp1, temp2
         # Position bookkeeping
         p1[temp1], p1[temp2] = p1[temp2], p1[temp1]
         p2[temp1], p2[temp2] = p2[temp2], p2[temp1]
-    ind1 = Permutation(ind1.perm,loss)
-    ind2 = Permutation(ind2.perm,loss)
+    ind1 = Permutation(ind1,loss)
+    ind2 = Permutation(ind2,loss)
     return ind1, ind2
 
 
@@ -100,11 +100,11 @@ def rand_choose(populaton):
     return par1,par2
 
 
-def choose_parents(popolation,use_random_choose=0):
+def choose_parents(population,use_random_choose=0):
     if use_random_choose:
-        return rand_choose(popolation)
+        return rand_choose(population)
     else:
-        return auto_breeding(popolation)
+        return auto_breeding(population)
 
 
 def mutation(perm: Permutation, coef_of_mutation):
@@ -139,7 +139,7 @@ def elite_selection(curr_population,childs,replace_coef=1,elite_coef=0.5):
     return next_gen
 
 
-def fit(tasks, count_of_generations, population_size,loss):
+def fit(tasks, count_of_generations, population_size,loss,replace_coef,elite_coef,choose_random_crossover):
     curr_population = generate_origin_population(population_size, tasks,loss)
 
 
@@ -151,7 +151,7 @@ def fit(tasks, count_of_generations, population_size,loss):
         population_copy = copy(curr_population)
         #выбираем родителей и воспроизводим потомков
         for j in range(population_size // 2):
-            par1, par2 = choose_parents(population_copy)
+            par1, par2 = choose_parents(population_copy,choose_random_crossover)
             child1, child2 = cxPartialyMatched(par1, par2,loss)
             childs += [child1, child2]
 
@@ -160,7 +160,7 @@ def fit(tasks, count_of_generations, population_size,loss):
             childs += mutation(childs[j], 0.5)
 
         #заменяем популяцию
-        curr_population = elite_selection(curr_population,childs,0.5,0.3)
+        curr_population = elite_selection(curr_population,childs,replace_coef,elite_coef)
 
     return sorted(curr_population, key=lambda x: x.loss)[0]
 

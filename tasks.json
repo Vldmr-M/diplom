@@ -1,0 +1,62 @@
+[
+    {
+        "Number": 0,
+        "DestTime": 5,
+        "Time": 10,
+        "Direktiv": 4
+    },
+    {
+        "Number": 1,
+        "DestTime": 9,
+        "Time": 8,
+        "Direktiv": 6
+    },
+    {
+        "Number": 2,
+        "DestTime": 9,
+        "Time": 7,
+        "Direktiv": 4
+    },
+    {
+        "Number": 3,
+        "DestTime": 8,
+        "Time": 11,
+        "Direktiv": 3
+    },
+    {
+        "Number": 4,
+        "DestTime": 7,
+        "Time": 10,
+        "Direktiv": 5
+    },
+    {
+        "Number": 5,
+        "DestTime": 9,
+        "Time": 9,
+        "Direktiv": 6
+    },
+    {
+        "Number": 6,
+        "DestTime": 8,
+        "Time": 9,
+        "Direktiv": 3
+    },
+    {
+        "Number": 7,
+        "DestTime": 8,
+        "Time": 10,
+        "Direktiv": 6
+    },
+    {
+        "Number": 8,
+        "DestTime": 7,
+        "Time": 8,
+        "Direktiv": 7
+    },
+    {
+        "Number": 9,
+        "DestTime": 7,
+        "Time": 11,
+        "Direktiv": 3
+    }
+]

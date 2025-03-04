@@ -1,6 +1,3 @@
-import numpy as np
-
-
 
 class Permutation:
     my_loss=None
@@ -11,7 +8,7 @@ class Permutation:
         self._loss = Permutation.my_loss(self._perm)
 
     def __ne__(self, other):
-        return np.sum(np.array(self._perm) != np.array(other.perm))
+        return sum(sign1!=sign2 for sign1,sign2 in zip(self.perm,other.perm))
 
     def __str__(self):
         return f"perm - {self.perm} loss - {self._loss}"
