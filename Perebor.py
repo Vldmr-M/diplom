@@ -1,7 +1,9 @@
 import itertools, pandas as pd
+from typing import Callable
+
 import Permutation
 
-def fullPerebor(tasks,loss):
+def fullPerebor(tasks:list,loss:Callable)->tuple:
     """Принимает на вход лист с задачами
     Возвращает перестановку и лосс для нее"""
     permutations = pd.DataFrame({"perm": itertools.permutations(range(len(tasks)))})

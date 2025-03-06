@@ -1,5 +1,7 @@
+from typing import Callable
 
-def Loss(tasks):
+
+def Loss(tasks:list)->Callable:
     """Принимает на вход массив объектов Task и перестановку
     возвращает перестановку с лучшим(меньшим) лоссом"""
     # for i in tasks:

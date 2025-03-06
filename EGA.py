@@ -1,9 +1,10 @@
 import itertools, random
+from typing import Callable
 from copy import copy, deepcopy
 from Permutation import Permutation
 
 
-def cxPartialyMatched(par1:Permutation, par2:Permutation,loss):
+def cxPartialyMatched(par1:Permutation, par2:Permutation,loss:Callable)->tuple:
     """Executes a partially matched crossover (PMX) on the input individuals.
     The two individuals are modified in place. This crossover expects
     :term:`sequence` individuals of indices, the result for any other type of
@@ -12,16 +13,6 @@ def cxPartialyMatched(par1:Permutation, par2:Permutation,loss):
     :param ind1: The first individual participating in the crossover.
     :param ind2: The second individual participating in the crossover.
     :returns: A tuple of two individuals.
-
-    Moreover, this crossover generates two children by matching
-    pairs of values in a certain range of the two parents and swapping the values
-    of those indexes. For more details see [Goldberg1985]_.
-
-    This function uses the :func:`~random.randint` function from the python base
-    :mod:`random` module.
-
-    .. [Goldberg1985] Goldberg and Lingel, "Alleles, loci, and the traveling
-       salesman problem", 1985.
     """
     ind1 = deepcopy(par1.perm)
     ind2 = deepcopy(par2.perm)
@@ -59,28 +50,21 @@ def cxPartialyMatched(par1:Permutation, par2:Permutation,loss):
     return ind1, ind2
 
 
-def hamming(par1: Permutation, par2: Permutation):
-    """
-    calculate hamming distance between 2 Permutations
-    :param par1: Permutation1
-    :param par2: Permutation2
-    :return: np.int64 distance
-    """
+def hamming(par1: Permutation, par2: Permutation) ->int:
     return par1 != par2
 
 
-def generate_origin_population(size_of_population, tasks,loss):
-    """returns list of Permutations where length of list = /size_of_population/ """
+def generate_origin_population(size_of_population:int, tasks:list,loss:Callable) ->list:
+
     perms = random.choices([*itertools.permutations(range(len(tasks)))], k=size_of_population)
     return [Permutation(list(i),loss) for i in perms]
 
-def auto_breeding(population):
+def auto_breeding(population:list)->tuple:
     """
-    choosing the parents
+    chooses the parents with max Hamming distance
     :param population: array_like of Permutation
     :return: tuple with 2 parents
     """
-
     par1 = population[0]
     par2 = population[1]
     max_hamm = 0
@@ -93,21 +77,32 @@ def auto_breeding(population):
     population.remove(par2)
     return par1, par2
 
-def rand_choose(populaton):
-    par1,par2 = random.choices(populaton,k=2)
-    populaton.remove(par1)
-    populaton.remove(par2)
+def rand_choose(population:list)->tuple:
+    """
+    chooses parents randomly
+    :param population:
+    :return:
+    """
+    # for i in population:
+    #     print(i)
+    # print("--------------")
+    par1,par2 = random.sample(population,k=2)
+    # print(par1)
+    # print(par2)
+    population.remove(par1)
+    population.remove(par2)
     return par1,par2
 
 
-def choose_parents(population,use_random_choose=0):
+def choose_parents(population:list,use_random_choose:int=0)->tuple:
     if use_random_choose:
         return rand_choose(population)
     else:
         return auto_breeding(population)
 
 
-def mutation(perm: Permutation, coef_of_mutation):
+def mutation(perm: Permutation, coef_of_mutation:float)->list[Permutation] | list[None]:
+
     if random.random() <= coef_of_mutation:
         mutant = deepcopy(perm)
         rand_indexes = random.choices(range(len(perm.perm)), k=2)
@@ -118,12 +113,25 @@ def mutation(perm: Permutation, coef_of_mutation):
         return []
 
 
-def elite_selection(curr_population,childs,replace_coef=1,elite_coef=0.5):
+def elite_selection(curr_population:list[Permutation],childs:list[Permutation],replace_coef:float=1,elite_coef:float=0.5)->list[Permutation]:
+    """
+    selects the best individuals from reproductive population and returns it.
+
+
+    chooses part of population by elite selection algorithm,
+    rest of population is replaced by Fitness proportionate selection algorithm
+    from childs
+
+    :param curr_population:
+    :param childs:
+    :param replace_coef:
+    :param elite_coef:
+    :return:
+    """
     replace_size = round(len(curr_population)*replace_coef)
     elite_size = round(elite_coef * replace_size)
     next_gen = random.choices(curr_population,k=len(curr_population)-replace_size)
     population = sorted(deepcopy(childs+curr_population), key=lambda x: x.loss)
-
 
     #заполняем элитой
     for i in range(elite_size):
@@ -139,9 +147,9 @@ def elite_selection(curr_population,childs,replace_coef=1,elite_coef=0.5):
     return next_gen
 
 
-def fit(tasks, count_of_generations, population_size,loss,replace_coef,elite_coef,choose_random_crossover):
-    curr_population = generate_origin_population(population_size, tasks,loss)
+def fit(tasks:list, count_of_generations:int, population_size:int,loss,replace_coef:float,elite_coef:float,choose_random_crossover:int)->Permutation:
 
+    curr_population = generate_origin_population(population_size, tasks,loss)
 
     for i in range(count_of_generations):
 

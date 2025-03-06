@@ -1,7 +1,9 @@
 import random,itertools
+from typing import Callable
 
-def generate_neighbours(perm):
-    """returns a list of tuples"""
+
+def generate_neighbours(perm:list)->list[list]:
+
     neighbours = []
     for i in range(len(perm) - 1):
         temp = perm[0:i] + perm[i + 1:i + 2] + perm[i:i + 1] + perm[i + 2:]
@@ -10,9 +12,8 @@ def generate_neighbours(perm):
     return neighbours
 
 
-def fit(tasks, loss):
-    """Принимает на вход массив объектов Task
-    возвращает перестановку с лучшим(меньшим) лоссом"""
+def fit(tasks:list, loss:Callable):
+
     curr_perm = random.choice([*itertools.permutations(range(len(tasks)))])
     curr_loss = loss(curr_perm)
 
