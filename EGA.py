@@ -65,6 +65,7 @@ def auto_breeding(population:list)->tuple:
     :param population: array_like of Permutation
     :return: tuple with 2 parents
     """
+
     par1 = population[0]
     par2 = population[1]
     max_hamm = 0
@@ -139,7 +140,7 @@ def elite_selection(curr_population:list[Permutation],childs:list[Permutation],r
 
     #вычисляем вероятности
     length_of_others = replace_size - elite_size
-    mean_fit = sum([j.loss for j in childs]) / len(childs)
+    # mean_fit = sum([j.loss for j in childs]) / len(childs)
     weights = [1/j.loss for j in childs]
 
     #заполняем остальное
@@ -147,28 +148,44 @@ def elite_selection(curr_population:list[Permutation],childs:list[Permutation],r
     return next_gen
 
 
-def fit(tasks:list, count_of_generations:int, population_size:int,loss,replace_coef:float,elite_coef:float,choose_random_crossover:int)->Permutation:
-
-    curr_population = generate_origin_population(population_size, tasks,loss)
+def fit(tasks:list, count_of_generations:int, population_size:int,loss,replace_coef:float,
+        mutation_coef:float,elite_coef:float,choose_random_parents:int,init_population:list=None)->Permutation:
+    gens_without_imp=0
+    if init_population:
+        curr_population = init_population
+    else:
+        curr_population = generate_origin_population(population_size, tasks,loss)
+    best_loss = sorted(curr_population, key=lambda x: x.loss)[0].loss
 
     for i in range(count_of_generations):
 
+
+        if gens_without_imp >= 10:
+            break
         childs = []
         # print("curr population - ")
         # for k in curr_population: print(k)
         population_copy = copy(curr_population)
         #выбираем родителей и воспроизводим потомков
         for j in range(population_size // 2):
-            par1, par2 = choose_parents(population_copy,choose_random_crossover)
+            par1, par2 = choose_parents(population_copy,choose_random_parents)
             child1, child2 = cxPartialyMatched(par1, par2,loss)
             childs += [child1, child2]
 
         #добавляем мутантов к потомкам
         for j in range(len(childs)):
-            childs += mutation(childs[j], 0.5)
+            childs += mutation(childs[j], mutation_coef)
 
         #заменяем популяцию
         curr_population = elite_selection(curr_population,childs,replace_coef,elite_coef)
+
+        #условие остановки
+        temp = sorted(curr_population, key=lambda x: x.loss)[0].loss
+        if temp < best_loss:
+            best_loss = temp
+            gens_without_imp = 0
+        else:
+            gens_without_imp+=1
 
     return sorted(curr_population, key=lambda x: x.loss)[0]
 

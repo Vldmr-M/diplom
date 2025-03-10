@@ -16,7 +16,7 @@ class Task:
             self.Direktiv = random.randrange(direktiv[0], direktiv[1])
 
     def __str__(self):
-        return (f"Number -                 {self.num}\n"
+        return (f"Number -      {self.num}\n"
                 f"DesttTime - {self.DestTime}\n"
                 f"Time - {self.Time}\n"
                 f"Direktiv - {self.Direktiv}\n"

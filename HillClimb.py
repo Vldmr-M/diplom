@@ -1,6 +1,6 @@
 import random,itertools
 from typing import Callable
-
+from Permutation import Permutation
 
 def generate_neighbours(perm:list)->list[list]:
 
@@ -27,4 +27,5 @@ def fit(tasks:list, loss:Callable):
             curr_loss = min(neighbours_losses.values())
         else:
             break
-    return curr_perm, curr_loss
+    # return curr_perm, curr_loss
+    return generate_neighbours(curr_perm), curr_loss
