@@ -50,12 +50,11 @@ def cxPartialyMatched(par1:Permutation, par2:Permutation,loss:Callable)->tuple:
     return ind1, ind2
 
 
-def hamming(par1: Permutation, par2: Permutation) ->int:
+def hamming_distance(par1: Permutation, par2: Permutation) ->int:
     return par1 != par2
 
 
 def generate_origin_population(size_of_population:int, tasks:list,loss:Callable) ->list:
-
     perms = random.choices([*itertools.permutations(range(len(tasks)))], k=size_of_population)
     return [Permutation(list(i),loss) for i in perms]
 
@@ -71,7 +70,7 @@ def auto_breeding(population:list)->tuple:
     max_hamm = 0
     for i in range(len(population)):
         for j in range(len(population)):
-            if hamming(population[i], population[j]) > max_hamm:
+            if hamming_distance(population[i], population[j]) > max_hamm:
                 par1 = population[i]
                 par2 = population[j]
     population.remove(par1)
@@ -148,29 +147,37 @@ def elite_selection(curr_population:list[Permutation],childs:list[Permutation],r
     return next_gen
 
 
+def construct_init_population(init_population, loss, population_size, tasks):
+    if init_population:
+        return init_population
+    else:
+        return generate_origin_population(population_size, tasks, loss)
+
+
+def create_childs(choose_random_parents, loss, population_copy, population_size):
+    childs =[]
+    for j in range(population_size // 2):
+        par1, par2 = choose_parents(population_copy, choose_random_parents)
+        child1, child2 = cxPartialyMatched(par1, par2, loss)
+        childs += [child1, child2]
+    return childs
+
+
 def fit(tasks:list, count_of_generations:int, population_size:int,loss,replace_coef:float,
         mutation_coef:float,elite_coef:float,choose_random_parents:int,init_population:list=None)->Permutation:
     gens_without_imp=0
-    if init_population:
-        curr_population = init_population
-    else:
-        curr_population = generate_origin_population(population_size, tasks,loss)
-    best_loss = sorted(curr_population, key=lambda x: x.loss)[0].loss
+
+    #создаем начальную популяцию
+    curr_population = construct_init_population(init_population, loss, population_size, tasks)
+    curr_best=sorted(curr_population, key=lambda x: x.loss)[0]
+    best_loss = curr_best.loss
 
     for i in range(count_of_generations):
-
-
         if gens_without_imp >= 10:
             break
-        childs = []
-        # print("curr population - ")
-        # for k in curr_population: print(k)
-        population_copy = copy(curr_population)
+
         #выбираем родителей и воспроизводим потомков
-        for j in range(population_size // 2):
-            par1, par2 = choose_parents(population_copy,choose_random_parents)
-            child1, child2 = cxPartialyMatched(par1, par2,loss)
-            childs += [child1, child2]
+        childs = create_childs(choose_random_parents, loss, copy(curr_population), population_size)
 
         #добавляем мутантов к потомкам
         for j in range(len(childs)):
@@ -180,18 +187,13 @@ def fit(tasks:list, count_of_generations:int, population_size:int,loss,replace_c
         curr_population = elite_selection(curr_population,childs,replace_coef,elite_coef)
 
         #условие остановки
-        temp = sorted(curr_population, key=lambda x: x.loss)[0].loss
-        if temp < best_loss:
-            best_loss = temp
+        curr_best = sorted(curr_population, key=lambda x: x.loss)[0]
+        curr_best_loss = curr_best.loss
+        if curr_best_loss < best_loss:
+            best_loss = curr_best_loss
             gens_without_imp = 0
         else:
             gens_without_imp+=1
 
-    return sorted(curr_population, key=lambda x: x.loss)[0]
+    return curr_best
 
-
-# a = fit(Task.tasks, 30, 20)
-#
-# print("final population - ")
-# for i in a:
-#     print(i)

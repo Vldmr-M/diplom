@@ -15,7 +15,7 @@ CHOOSE_RANDOM_PARENT_SELECTION =0  # 0 - PMX  /  1 - RANDOM
 
 
 #global settings
-NUM_OF_EXPERIMENTS =100
+NUM_OF_EXPERIMENTS =10
 
 
 # best settings :
